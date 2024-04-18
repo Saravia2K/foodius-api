@@ -12,3 +12,90 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Users {
+  id           Int      @id @default(autoincrement())
+  names        String   @db.VarChar(255)
+  last_names   String   @db.VarChar(255)
+  email        String   @unique @db.VarChar(255)
+  phone_number String   @unique @db.VarChar(8)
+  location     String
+  password     String   @db.VarChar(100)
+  Orders       Orders[]
+}
+
+model Businesses {
+  id           Int              @id @default(autoincrement())
+  name         String           @db.VarChar(255)
+  email        String           @unique @db.VarChar(255)
+  phone_number String           @unique @db.VarChar(8)
+  location     String
+  password     String           @db.VarChar(100)
+  FoodCategory FoodCategories[]
+  Schedules    Schedules[]
+}
+
+model Schedules {
+  id          Int        @id @default(autoincrement())
+  Business    Businesses @relation(fields: [id_business], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id_business Int
+  day         String     @db.VarChar(50)
+  from        DateTime   @db.Timestamp()
+  to          DateTime   @db.Timestamp()
+}
+
+model FoodCategories {
+  id          Int        @id @default(autoincrement())
+  Business    Businesses @relation(fields: [id_business], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id_business Int
+  name        String     @db.VarChar(255)
+  description String
+  Food        Foods[]
+}
+
+model Foods {
+  id               Int             @id @default(autoincrement())
+  FoodCategory     FoodCategories  @relation(fields: [id_food_category], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id_food_category Int
+  name             String          @db.VarChar(255)
+  description      String
+  price            Decimal         @db.Decimal(10, 2)
+  extra_fee        Decimal         @db.Decimal(10, 2)
+  img_url          String          @db.VarChar(500)
+  is_available     Boolean
+  OrdersDetails    OrdersDetails[]
+}
+
+model Orders {
+  id              Int              @id @default(autoincrement())
+  User            Users            @relation(fields: [id_user], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  id_user         Int
+  state           ORDER_STATES
+  date            DateTime
+  delivery_method DELIVERY_METHODS
+  OrdersDetails   OrdersDetails[]
+}
+
+model OrdersDetails {
+  id       Int     @id @default(autoincrement())
+  Order    Orders  @relation(fields: [id_order], references: [id])
+  id_order Int
+  Food     Foods   @relation(fields: [id_food], references: [id])
+  id_food  Int
+  price    Decimal @db.Decimal(10, 2)
+  quantity Int
+}
+
+enum ORDER_STATES {
+  ACTIVE
+  PREPARING
+  FINISHED
+  DELIVERING
+  DELIVERED
+  CANCELED
+}
+
+enum DELIVERY_METHODS {
+  UPON_DELIVERY
+  HOME_DELIVERY
+}

@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { TUser } from "../utils/types";
-import prisma from "../utils/prisma";
 import User from "../models/User";
 
 export default class UsersController {

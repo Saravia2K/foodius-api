@@ -1,4 +1,6 @@
+import bcrypt from "bcryptjs";
 import prisma from "../utils/prisma";
+import { TUser } from "../utils/types";
 
 export default class User {
   /**
@@ -10,6 +12,21 @@ export default class User {
     return await prisma.users.findFirst({
       where: {
         email,
+      },
+    });
+  }
+
+  /**
+   *
+   * @param user User information
+   */
+  static async create(user: TUser) {
+    const { password, ..._data } = user;
+
+    await prisma.users.create({
+      data: {
+        ..._data,
+        password: bcrypt.hashSync(password),
       },
     });
   }

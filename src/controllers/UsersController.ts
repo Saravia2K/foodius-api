@@ -10,14 +10,7 @@ export default class UsersController {
    */
   static async SignUp(req: Request, res: Response) {
     try {
-      const { password, ..._data } = req.body as TUser;
-
-      await prisma.users.create({
-        data: {
-          ..._data,
-          password: bcrypt.hashSync(password),
-        },
-      });
+      await User.create(req.body as TUser);
 
       res.status(201).json({
         message: "User created successfully",

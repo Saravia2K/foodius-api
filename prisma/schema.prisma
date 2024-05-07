@@ -31,6 +31,8 @@ model Businesses {
   phone_number String           @unique @db.VarChar(8)
   location     String
   password     String           @db.VarChar(100)
+  logo         String           @db.VarChar(255)
+  banner       String           @db.VarChar(255)
   FoodCategory FoodCategories[]
   Schedules    Schedules[]
 }

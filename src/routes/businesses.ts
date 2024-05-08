@@ -5,7 +5,6 @@ const router = Router();
 
 router.get("/", BusinessesController.GetBusiness);
 
-router.get("/:id", BusinessesController.GetInfo);
-
+router.get("/:slug", BusinessesController.GetInfo);
 
 export default router;

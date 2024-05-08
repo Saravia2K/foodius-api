@@ -6,20 +6,22 @@ export default class Business {
     return await prisma.businesses.findMany({
       select: {
         name: true,
-        logo: true,
         banner: true,
+        slug: true,
       },
     });
   }
 
-  static async infoBusiness(id: number) {
+  static async infoBusiness(slug: string) {
     return await prisma.businesses.findFirst({
-      where: { id },
+      where: { slug },
       include: {
-        Schedules: { select: { day: true, from: true, to: true } },
+        Schedules: true,
         FoodCategory: {
-          include: {
-            Food: { select: { name: true, price: true, img_url: true } },
+          select: {
+            name: true,
+            description: true,
+            Food: true,
           },
         },
       },

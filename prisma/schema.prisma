@@ -33,6 +33,7 @@ model Businesses {
   password     String           @db.VarChar(100)
   logo         String           @db.VarChar(255)
   banner       String           @db.VarChar(255)
+  slug         String           @db.VarChar(255)
   FoodCategory FoodCategories[]
   Schedules    Schedules[]
 }
@@ -74,6 +75,7 @@ model Orders {
   id_user         Int
   state           ORDER_STATES
   date            DateTime
+  token           String?          @unique @default(uuid()) @db.VarChar(100)
   delivery_method DELIVERY_METHODS
   OrdersDetails   OrdersDetails[]
 }

@@ -1,4 +1,3 @@
-import { Select } from "@prisma/client/runtime/library";
 import prisma from "../utils/prisma";
 
 export default class Business {

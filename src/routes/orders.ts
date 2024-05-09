@@ -5,6 +5,6 @@ const router = Router();
 
 router.post("/", OrdersController.Order);
 
-router.get("/:id", OrdersController.OrderState);
+router.get("/:token", OrdersController.OrderState);
 
 export default router;

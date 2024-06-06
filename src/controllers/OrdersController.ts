@@ -1,11 +1,19 @@
-import { Request, Response } from "express";
 import Order from "../models/Order";
-import { TOrder } from "../utils/types";
+import NoOrderPlates from "../errors/NoOrderPlates";
+import type { Request, Response } from "express";
+import type { TCreateOrderBody } from "./types";
 
 export default class OrdersController {
-  static async Order(req: Request, res: Response) {
+  /**
+   * POST: /
+   */
+  static async Order(req: Request<{}, {}, TCreateOrderBody>, res: Response) {
     try {
-      const order = await Order.createOrder(req.body as TOrder);
+      const { id_user, plates } = req.body;
+
+      if (!plates || !plates.length) throw new NoOrderPlates();
+
+      const order = await Order.createOrder(id_user, plates);
 
       res.status(201).json({
         message: "Order created successfully",

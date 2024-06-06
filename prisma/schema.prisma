@@ -74,7 +74,7 @@ model Orders {
   User            Users            @relation(fields: [id_user], references: [id], onDelete: Cascade, onUpdate: Cascade)
   id_user         Int
   state           ORDER_STATES
-  date            DateTime
+  date            DateTime?        @default(now()) @db.Timestamp()
   token           String?          @unique @default(uuid()) @db.VarChar(100)
   delivery_method DELIVERY_METHODS
   OrdersDetails   OrdersDetails[]
@@ -82,9 +82,9 @@ model Orders {
 
 model OrdersDetails {
   id       Int     @id @default(autoincrement())
-  Order    Orders  @relation(fields: [id_order], references: [id])
+  Order    Orders  @relation(fields: [id_order], references: [id], onDelete: Cascade, onUpdate: Cascade)
   id_order Int
-  Food     Foods   @relation(fields: [id_food], references: [id])
+  Food     Foods   @relation(fields: [id_food], references: [id], onDelete: Cascade, onUpdate: Cascade)
   id_food  Int
   price    Decimal @db.Decimal(10, 2)
   quantity Int

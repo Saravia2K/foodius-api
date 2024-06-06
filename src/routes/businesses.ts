@@ -7,4 +7,6 @@ router.get("/", BusinessesController.GetBusiness);
 
 router.get("/:slug", BusinessesController.GetInfo);
 
+router.get("/:id/dashboard", BusinessesController.GetInfoForDashboard);
+
 export default router;

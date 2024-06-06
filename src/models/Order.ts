@@ -1,3 +1,4 @@
+import { ORDER_STATES } from "@prisma/client";
 import { TCreateOrderPlate } from "../controllers/types";
 import prisma from "../utils/prisma";
 
@@ -23,12 +24,35 @@ export default class Orders {
     });
   }
 
+  /**
+   *
+   * @param token
+   * @returns
+   */
   static async trackingOrder(token: string) {
     return await prisma.orders.findFirst({
       where: {
         token,
       },
       select: { state: true },
+    });
+  }
+
+  /**
+   *
+   * @param newState
+   */
+  static async updateOrder(
+    id: number,
+    newState: Omit<ORDER_STATES, "CANCELED">
+  ) {
+    await prisma.orders.update({
+      where: {
+        id,
+      },
+      data: {
+        state: newState as ORDER_STATES,
+      },
     });
   }
 }

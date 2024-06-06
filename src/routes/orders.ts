@@ -7,4 +7,6 @@ router.post("/", OrdersController.Order);
 
 router.get("/:token", OrdersController.OrderState);
 
+router.patch("/:id/state", OrdersController.UpdateOrderState);
+
 export default router;

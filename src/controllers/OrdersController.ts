@@ -1,7 +1,10 @@
 import Order from "../models/Order";
 import NoOrderPlates from "../errors/NoOrderPlates";
 import type { Request, Response } from "express";
-import type { TCreateOrderBody } from "./types";
+import type { TCreateOrderBody, TUpdateStateBody } from "./types";
+import { TIDParam } from "../utils/types";
+import { ORDER_STATES } from "@prisma/client";
+import NoCancelActionAllowed from "../errors/NoCancelActionAllowed";
 
 export default class OrdersController {
   /**
@@ -26,6 +29,9 @@ export default class OrdersController {
     }
   }
 
+  /**
+   * GET: /:token
+   */
   static async OrderState(req: Request, res: Response) {
     try {
       const { token } = req.params;
@@ -38,6 +44,31 @@ export default class OrdersController {
       const orden = await Order.trackingOrder(token);
 
       res.json(orden);
+    } catch (error: any) {
+      res.status(500).json({
+        message: `Error: ${error.message}`,
+      });
+    }
+  }
+
+  /**
+   * /:id/state
+   */
+  static async UpdateOrderState(
+    req: Request<TIDParam, {}, TUpdateStateBody>,
+    res: Response
+  ) {
+    try {
+      const { id } = req.params;
+      const { state } = req.body;
+
+      if (state == ORDER_STATES.CANCELED) throw new NoCancelActionAllowed();
+
+      await Order.updateOrder(+id, state);
+
+      res.json({
+        message: "Order updated successfully",
+      });
     } catch (error: any) {
       res.status(500).json({
         message: `Error: ${error.message}`,

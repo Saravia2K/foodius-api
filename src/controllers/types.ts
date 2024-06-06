@@ -1,7 +1,5 @@
 //#region Business
-export type TGetInfoForDashboardParams = {
-  id: string;
-};
+
 //#endregion
 
 //#region Orders

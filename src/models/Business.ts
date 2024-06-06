@@ -1,5 +1,7 @@
+import { ORDER_STATES } from "@prisma/client";
 import NoBusinessFound from "../errors/NoBusinessFound";
 import prisma from "../utils/prisma";
+import formatName from "../utils/formatName";
 
 export default class Business {
   /**
@@ -37,6 +39,11 @@ export default class Business {
     });
   }
 
+  /**
+   *
+   * @param id
+   * @returns
+   */
   static async infoForDashboard(id: number) {
     const bussinessPromise = prisma.businesses.findUnique({
       where: {
@@ -78,5 +85,87 @@ export default class Business {
       ...business,
       satisfied,
     };
+  }
+
+  /**
+   *
+   * @param businessId
+   * @returns
+   */
+  static async getOrders(businessId: number) {
+    const ordersDetails = await prisma.ordersDetails.findMany({
+      where: {
+        Food: {
+          FoodCategory: {
+            id_business: businessId,
+          },
+        },
+      },
+      select: {
+        price: true,
+        quantity: true,
+        Food: {
+          select: {
+            name: true,
+          },
+        },
+        Order: {
+          select: {
+            id: true,
+            state: true,
+            date: true,
+            User: {
+              select: {
+                names: true,
+                last_names: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    type TOrder = Record<
+      number,
+      {
+        state: ORDER_STATES;
+        datetime: Date;
+        client: string;
+        total: number;
+        details: {
+          name: string;
+          price: number;
+          amount: number;
+        }[];
+      }
+    >;
+
+    const orders: TOrder = {};
+    for (const o of ordersDetails) {
+      const { Order, price, quantity, Food } = o;
+      const { id, date, state, User } = Order;
+
+      if (orders[id] == undefined) {
+        const { names, last_names } = User;
+        orders[id] = {
+          client: formatName(`${names} ${last_names}`),
+          datetime: date!,
+          state,
+          total: 0,
+          details: [],
+        };
+      }
+
+      const { name } = Food;
+      const priceNumber = price.toNumber();
+      orders[id].total += priceNumber * quantity;
+      orders[id].details.push({
+        name,
+        amount: quantity,
+        price: priceNumber,
+      });
+    }
+
+    return orders;
   }
 }

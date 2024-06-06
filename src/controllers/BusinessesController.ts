@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import Business from "../models/Business";
-import { TGetInfoForDashboardParams } from "./types";
+import { TIDParam } from "../utils/types";
 
 export default class BusinessesController {
   static async GetBusiness(req: Request, res: Response) {
@@ -33,14 +33,28 @@ export default class BusinessesController {
   /**
    * GET: /:id/dashboard
    */
-  static async GetInfoForDashboard(
-    req: Request<TGetInfoForDashboardParams>,
-    res: Response
-  ) {
+  static async GetInfoForDashboard(req: Request<TIDParam>, res: Response) {
     try {
       const { id } = req.params;
 
       const info = await Business.infoForDashboard(+id);
+
+      res.json(info);
+    } catch (error: any) {
+      res.status(500).json({
+        message: `Error: ${error.message}`,
+      });
+    }
+  }
+
+  /**
+   * GET: /:id/orders
+   */
+  static async GetBusinessOrders(req: Request<TIDParam>, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const info = await Business.getOrders(+id);
 
       res.json(info);
     } catch (error: any) {

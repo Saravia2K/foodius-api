@@ -1,7 +1,11 @@
 import Order from "../models/Order";
 import NoOrderPlates from "../errors/NoOrderPlates";
 import type { Request, Response } from "express";
-import type { TCreateOrderBody, TUpdateStateBody } from "./types";
+import type {
+  TCancelOrderBody,
+  TCreateOrderBody,
+  TUpdateStateBody,
+} from "./types";
 import { TIDParam } from "../utils/types";
 import { ORDER_STATES } from "@prisma/client";
 import NoCancelActionAllowed from "../errors/NoCancelActionAllowed";
@@ -68,6 +72,31 @@ export default class OrdersController {
 
       res.json({
         message: "Order updated successfully",
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        message: `Error: ${error.message}`,
+      });
+    }
+  }
+
+  /**
+   * POST: /:id/cancel
+   */
+  static async CancelOrder(
+    req: Request<TIDParam, {}, TCancelOrderBody>,
+    res: Response
+  ) {
+    try {
+      const { id } = req.params;
+      const { message } = req.body;
+
+      if (!message) throw new Error("Message is required to cancel an order");
+
+      await Order.cancelOrder(+id, message);
+
+      res.json({
+        message: "Order canceled successfully",
       });
     } catch (error: any) {
       res.status(500).json({

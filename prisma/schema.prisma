@@ -78,6 +78,7 @@ model Orders {
   token           String?          @unique @default(uuid()) @db.VarChar(100)
   delivery_method DELIVERY_METHODS
   OrdersDetails   OrdersDetails[]
+  Cancellation    Cancellation[]
 }
 
 model OrdersDetails {
@@ -88,6 +89,13 @@ model OrdersDetails {
   id_food  Int
   price    Decimal @db.Decimal(10, 2)
   quantity Int
+}
+
+model Cancellation {
+  id      Int    @id @default(autoincrement())
+  order   Orders @relation(fields: [orderId], references: [id])
+  orderId Int
+  message String
 }
 
 enum ORDER_STATES {

@@ -19,4 +19,8 @@ export type TCreateOrderPlate = {
 export type TUpdateStateBody = {
   state: Omit<ORDER_STATES, "CANCELED">;
 };
+
+export type TCancelOrderBody = {
+  message: string;
+};
 //#endregion

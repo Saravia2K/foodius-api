@@ -1,8 +1,58 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
+import fs from "fs";
+import path from "path";
 import Business from "../models/Business";
 import { TIDParam } from "../utils/types";
+import { TRegisterBody, TRegisterFiles } from "./types";
 
 export default class BusinessesController {
+  /**
+   * POST: /
+   */
+  static async RegisterBusiness(
+    req: Request<{}, {}, TRegisterBody>,
+    res: Response
+  ) {
+    const businessInfo = req.body;
+    const getFilename = (path: string) => path.split("/")[1];
+    const files = req.files as TRegisterFiles | undefined;
+
+    try {
+      if (
+        files == undefined ||
+        files.logo == undefined ||
+        files.banner == undefined
+      )
+        throw new Error(
+          "Logo and banner are required to create a new business"
+        );
+
+      const logoFile = files.logo[0];
+      const bannerFile = files.banner[0];
+
+      const newBusiness = await Business.createBusiness({
+        ...businessInfo,
+        logo: getFilename(logoFile.filename),
+        banner: getFilename(bannerFile.filename),
+      });
+
+      res.status(201).json(newBusiness);
+    } catch (error: any) {
+      if (files != undefined) {
+        const filesArr = Object.values(files);
+        for (const fa of filesArr) {
+          const filename = fa[0].filename;
+          const imagePath = path.join(__dirname, `../uploads/${filename}`);
+          if (fs.existsSync(imagePath)) fs.rmSync(imagePath);
+        }
+      }
+
+      res.status(500).json({
+        message: `Error trying to register a business: ${error.message}`,
+      });
+    }
+  }
+
   static async GetBusiness(req: Request, res: Response) {
     try {
       const businesses = await Business.getAll();

@@ -1,7 +1,10 @@
 import { ORDER_STATES } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import NoBusinessFound from "../errors/NoBusinessFound";
-import prisma from "../utils/prisma";
+import prisma, { prismaExclude } from "../utils/prisma";
 import formatName from "../utils/formatName";
+import { TRegisterBody } from "../controllers/types";
+import slugify from "../utils/slugify";
 
 export default class Business {
   /**
@@ -168,4 +171,22 @@ export default class Business {
 
     return orders;
   }
+
+  /**
+   *
+   * @param business
+   */
+  static async createBusiness(business: TCreateBusinessParam) {
+    const { password, ...businessInfo } = business;
+    return await prisma.businesses.create({
+      data: {
+        ...businessInfo,
+        password: bcrypt.hashSync(password),
+        slug: slugify(business.name),
+      },
+      select: prismaExclude("Businesses", ["password"]),
+    });
+  }
 }
+
+type TCreateBusinessParam = TRegisterBody & { logo: string; banner: string };

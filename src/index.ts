@@ -3,12 +3,14 @@ import dotenv from "dotenv";
 import path from "path";
 import fs from "fs";
 import cors from "cors";
+import bodyParser from "body-parser";
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/static", express.static(path.join(__dirname, "uploads")));
 
 //

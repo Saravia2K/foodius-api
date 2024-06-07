@@ -1,7 +1,18 @@
-//#region Business
-
 import { ORDER_STATES } from "@prisma/client";
 
+//#region Business
+export type TRegisterBody = {
+  name: string;
+  email: string;
+  phone_number: string;
+  location: string;
+  password: string;
+};
+
+export type TRegisterFiles = {
+  logo: Express.Multer.File[];
+  banner: Express.Multer.File[];
+};
 //#endregion
 
 //#region Orders

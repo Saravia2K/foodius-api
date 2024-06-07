@@ -19,6 +19,14 @@ export type TRegisterFiles = {
 export type TUpdateAviabilityBody = {
   available: boolean;
 };
+
+export type TCreateFoodBody = {
+  id_food_category: string;
+  name: string;
+  description: string;
+  price: number;
+  is_available: string;
+};
 //#endregion
 
 //#region Orders

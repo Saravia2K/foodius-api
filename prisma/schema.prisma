@@ -63,7 +63,6 @@ model Foods {
   name             String          @db.VarChar(255)
   description      String
   price            Decimal         @db.Decimal(10, 2)
-  extra_fee        Decimal         @db.Decimal(10, 2)
   img_url          String          @db.VarChar(500)
   is_available     Boolean
   OrdersDetails    OrdersDetails[]

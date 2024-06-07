@@ -1,9 +1,56 @@
 import { Request, Response } from "express";
 import { TIDParam } from "../utils/types";
-import { TUpdateAviabilityBody } from "./types";
+import { TCreateFoodBody, TUpdateAviabilityBody } from "./types";
 import Food from "../models/Food";
+import path from "path";
+import fs from "fs";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 
 export default class FoodController {
+  /**
+   * POST: /
+   */
+  static async CreateFood(
+    req: Request<{}, {}, TCreateFoodBody>,
+    res: Response
+  ) {
+    const file = req.file;
+
+    try {
+      if (!file) throw new Error("Image is needed to create a new food");
+
+      const { id_food_category, is_available, ...body } = req.body;
+      const newFood = await Food.createFood(
+        {
+          id_food_category: +id_food_category,
+          ...body,
+          is_available: is_available == "true",
+        },
+        file.filename
+      );
+
+      res.json(newFood);
+    } catch (error: any) {
+      if (file != undefined) {
+        const filename = file.filename;
+        const imagePath = path.join(__dirname, `../uploads/foods/${filename}`);
+        if (fs.existsSync(imagePath)) fs.rmSync(imagePath);
+      }
+
+      let statusCode = 500;
+      let message = error.message;
+      if (error instanceof PrismaClientValidationError) {
+        statusCode = 400;
+        message = "Incomplete request body. Fields are missing";
+        console.log(error.message);
+      }
+
+      res.status(statusCode).json({
+        message: `Error: ${message}`,
+      });
+    }
+  }
+
   /**
    * PATCH: /food/:id/aviability
    */

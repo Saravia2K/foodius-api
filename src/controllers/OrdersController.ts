@@ -9,6 +9,7 @@ import type {
 import { TIDParam } from "../utils/types";
 import { ORDER_STATES } from "@prisma/client";
 import NoCancelActionAllowed from "../errors/NoCancelActionAllowed";
+import FoodNoAvailable from "../errors/FoodNoAvailable";
 
 export default class OrdersController {
   /**
@@ -27,7 +28,8 @@ export default class OrdersController {
         token: order.token,
       });
     } catch (error: any) {
-      res.status(500).json({
+      const statusCode = error instanceof FoodNoAvailable ? 409 : 500;
+      res.status(statusCode).json({
         message: `Error: ${error.message}`,
       });
     }

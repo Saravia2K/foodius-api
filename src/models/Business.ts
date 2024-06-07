@@ -35,7 +35,14 @@ export default class Business {
           select: {
             name: true,
             description: true,
-            Food: true,
+            Food: {
+              where: {
+                is_available: true,
+              },
+              orderBy: {
+                id: "asc",
+              },
+            },
           },
         },
       },

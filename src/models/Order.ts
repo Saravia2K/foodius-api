@@ -1,6 +1,7 @@
 import { ORDER_STATES } from "@prisma/client";
 import { TCreateOrderPlate } from "../controllers/types";
 import prisma from "../utils/prisma";
+import FoodNoAvailable from "../errors/FoodNoAvailable";
 
 export default class Orders {
   /**
@@ -10,6 +11,19 @@ export default class Orders {
    * @returns
    */
   static async createOrder(id_user: number, plates: TCreateOrderPlate[]) {
+    for (const p of plates) {
+      const food = await prisma.foods.findFirst({
+        where: {
+          id: p.id_food,
+        },
+        select: {
+          is_available: true,
+        },
+      });
+
+      if (!food?.is_available) throw new FoodNoAvailable();
+    }
+
     return await prisma.orders.create({
       data: {
         id_user,

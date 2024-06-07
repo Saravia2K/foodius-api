@@ -15,6 +15,12 @@ export type TRegisterFiles = {
 };
 //#endregion
 
+//#region Food
+export type TUpdateAviabilityBody = {
+  available: boolean;
+};
+//#endregion
+
 //#region Orders
 export type TCreateOrderBody = {
   id_user: number;

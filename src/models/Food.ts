@@ -1,5 +1,7 @@
+import path from "path";
 import { TCreateFoodBody } from "../controllers/types";
 import prisma from "../utils/prisma";
+import fs from "fs";
 
 export default class Food {
   /**
@@ -31,6 +33,28 @@ export default class Food {
         img_url,
       },
     });
+  }
+
+  /**
+   *
+   * @param id
+   * @returns
+   */
+  static async deleteFood(id: number) {
+    try {
+      const food = await prisma.foods.delete({
+        where: {
+          id,
+        },
+      });
+
+      const filePath = path.join(__dirname, `../uploads/foods/${food.img_url}`);
+      fs.unlinkSync(filePath);
+
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
 

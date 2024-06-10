@@ -5,6 +5,7 @@ import Food from "../models/Food";
 import path from "path";
 import fs from "fs";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+import CouldNotDeleteFood from "../errors/CouldNotDeleteFood";
 
 export default class FoodController {
   /**
@@ -73,6 +74,26 @@ export default class FoodController {
     } catch (error: any) {
       res.status(500).json({
         message: `Error: ${error.message}`,
+      });
+    }
+  }
+
+  /**
+   * DELETE: /:id
+   */
+  static async DeleteFood(req: Request<TIDParam>, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const deleted = Food.deleteFood(+id);
+      if (!deleted) throw new CouldNotDeleteFood();
+
+      res.json({
+        message: "Food deleted successfully",
+      });
+    } catch (error: any) {
+      res.status(500).json({
+        message: `Error trying to delete food: ${error.message}`,
       });
     }
   }

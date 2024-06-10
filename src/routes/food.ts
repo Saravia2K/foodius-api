@@ -12,4 +12,8 @@ router.post("/", uploadFoodImgMiddleware, FoodController.CreateFood);
 router.patch("/:id/aviability", FoodController.UpdateFoodAviability);
 //#endregion
 
+//#region DELETE
+router.delete("/:id", FoodController.DeleteFood);
+//#endregion
+
 export default router;

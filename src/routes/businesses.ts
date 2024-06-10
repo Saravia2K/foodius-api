@@ -15,6 +15,8 @@ router.post(
 //#region GET
 router.get("/", BusinessesController.GetBusiness);
 
+router.get("/:id/food", BusinessesController.GetBusinessFood);
+
 router.get("/:slug", BusinessesController.GetInfo);
 
 router.get("/:id/dashboard", BusinessesController.GetInfoForDashboard);

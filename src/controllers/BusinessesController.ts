@@ -53,6 +53,23 @@ export default class BusinessesController {
     }
   }
 
+  /**
+   * GET: /:id/food
+   */
+  static async GetBusinessFood(req: Request<TIDParam>, res: Response) {
+    try {
+      const { id } = req.params;
+
+      const food = await Business.getFood(+id);
+
+      res.json(food);
+    } catch (error: any) {
+      res.status(500).json({
+        message: `Error trying to get food for this business: ${error.message}`,
+      });
+    }
+  }
+
   static async GetBusiness(req: Request, res: Response) {
     try {
       const businesses = await Business.getAll();

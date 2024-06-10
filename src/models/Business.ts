@@ -5,6 +5,7 @@ import prisma, { prismaExclude } from "../utils/prisma";
 import formatName from "../utils/formatName";
 import { TRegisterBody } from "../controllers/types";
 import slugify from "../utils/slugify";
+import os from "os";
 
 export default class Business {
   /**
@@ -193,6 +194,58 @@ export default class Business {
       },
       select: prismaExclude("Businesses", ["password"]),
     });
+  }
+
+  /**
+   *
+   * @param businessId
+   * @returns
+   */
+  static async getFood(businessId: number) {
+    const foodCategories = await prisma.foodCategories.findMany({
+      where: {
+        id_business: businessId,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        Food: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+            img_url: true,
+            is_available: true,
+            price: true,
+          },
+        },
+      },
+    });
+
+    type TFoodCategories = (typeof foodCategories)[number];
+    type TFoodCategoriesInfo = Omit<TFoodCategories, "id" | "Food">;
+    type TFoodCategoriesFood = TFoodCategories["Food"][number];
+    type TFood = Record<
+      number,
+      TFoodCategoriesInfo & {
+        dishes: TFoodCategoriesFood[];
+      }
+    >;
+    const food: TFood = {};
+
+    for (const f of foodCategories) {
+      const { id, Food, ...category } = f;
+      food[id] = {
+        ...category,
+        dishes: Food.map(({ img_url, ...F }) => ({
+          ...F,
+          img_url: `uploads/foods/${img_url}`,
+        })),
+      };
+    }
+
+    return food;
   }
 }
 

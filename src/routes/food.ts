@@ -9,6 +9,8 @@ router.post("/", uploadFoodImgMiddleware, FoodController.CreateFood);
 //#endregion
 
 //#region PATCH
+router.patch("/:id");
+
 router.patch("/:id/aviability", FoodController.UpdateFoodAviability);
 //#endregion
 

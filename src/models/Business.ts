@@ -19,6 +19,9 @@ export default class Business {
         banner: true,
         slug: true,
       },
+      orderBy: {
+        id: "asc",
+      },
     });
   }
 
@@ -134,14 +137,21 @@ export default class Business {
           },
         },
       },
+      orderBy: {
+        Order: {
+          id: "asc",
+        },
+      },
     });
 
     type TOrder = Record<
       number,
       {
+        id: number;
         state: ORDER_STATES;
         datetime: Date;
         client: string;
+        service: number;
         total: number;
         details: {
           name: string;
@@ -159,9 +169,11 @@ export default class Business {
       if (orders[id] == undefined) {
         const { names, last_names } = User;
         orders[id] = {
+          id,
           client: formatName(`${names} ${last_names}`),
           datetime: date!,
           state,
+          service: 0,
           total: 0,
           details: [],
         };
@@ -169,7 +181,10 @@ export default class Business {
 
       const { name } = Food;
       const priceNumber = price.toNumber();
-      orders[id].total += priceNumber * quantity;
+      const total = priceNumber * quantity;
+      const service = total * 0.15;
+      orders[id].total += +(total + service).toFixed(2);
+      orders[id].service += +service.toFixed(2);
       orders[id].details.push({
         name,
         amount: quantity,
@@ -219,7 +234,13 @@ export default class Business {
             is_available: true,
             price: true,
           },
+          orderBy: {
+            id: "asc",
+          },
         },
+      },
+      orderBy: {
+        id: "asc",
       },
     });
 
@@ -240,7 +261,7 @@ export default class Business {
         ...category,
         dishes: Food.map(({ img_url, ...F }) => ({
           ...F,
-          img_url: `uploads/foods/${img_url}`,
+          img_url: `static/foods/${img_url}`,
         })),
       };
     }

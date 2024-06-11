@@ -42,11 +42,10 @@ export default class SchedulesController{
     
     static async updateSchedule(req: Request, res: Response){
         const { id } = req.params;
-        const { day, from, to } = req.body;
+        const { from, to } = req.body;
         try {
             const updatedSchedule = await Schedules.updateSchedule(
             Number(id),
-            day,
             new Date(from),
             new Date(to)
         );

@@ -1,12 +1,9 @@
 import prisma from "../utils/prisma";
 
 export default class Schedules {
-
-
   static async getAllSchedules() {
     return await prisma.schedules.findMany();
   }
-
 
   /**
    *
@@ -16,26 +13,30 @@ export default class Schedules {
    * @param to
    * @returns
    */
-  static async createSchedule(id_business: number, day: string, from: Date, to: Date) {
+  static async createSchedule(
+    id_business: number,
+    day: string,
+    from: Date,
+    to: Date
+  ) {
     return await prisma.schedules.create({
-        data:{
-            id_business,
-            day,
-            from,
-            to,
-        },
+      data: {
+        id_business,
+        day,
+        from,
+        to,
+      },
     });
   }
 
-  static async findScheduleByDay(id_business: number, day: string){
+  static async findScheduleByDay(id_business: number, day: string) {
     return await prisma.schedules.findFirst({
-        where:{
-            id_business,
-            day,
-        }
-    })
+      where: {
+        id_business,
+        day,
+      },
+    });
   }
-
 
   static async findSchedulesByBusinessId(id_business: number) {
     return await prisma.schedules.findMany({
@@ -44,15 +45,14 @@ export default class Schedules {
       },
     });
   }
-  
-  static async updateSchedule(id: number, day: string, from: Date, to: Date) {
+
+  static async updateSchedule(id: number, from: Date, to: Date) {
     try {
       return await prisma.schedules.update({
         where: {
           id,
         },
         data: {
-          day,
           from,
           to,
         },
@@ -64,25 +64,14 @@ export default class Schedules {
 
   static async deleteSchedule(id: number) {
     try {
-        await prisma.schedules.delete({
-            where:{
-                id,
-            }
-        })
-        return true;
-
-    }catch(error){
-
-        return false;
+      await prisma.schedules.delete({
+        where: {
+          id,
+        },
+      });
+      return true;
+    } catch (error) {
+      return false;
     }
   }
-
-
-
 }
-
-
-
-
-
-

@@ -30,7 +30,7 @@ export default class FoodController {
         file.filename
       );
 
-      res.json(newFood);
+      res.status(201).json(newFood);
     } catch (error: any) {
       if (file != undefined) {
         const filename = file.filename;
@@ -53,7 +53,19 @@ export default class FoodController {
   }
 
   /**
-   * PATCH: /food/:id/aviability
+   * PATCH: /:id
+   */
+  static async UpdateFood(req: Request<TIDParam>, res: Response) {
+    try {
+    } catch (error: any) {
+      res.status(500).json({
+        message: `Error: ${error.message}`,
+      });
+    }
+  }
+
+  /**
+   * PATCH: /:id/aviability
    */
   static async UpdateFoodAviability(
     req: Request<TIDParam, {}, TUpdateAviabilityBody>,

@@ -56,6 +56,35 @@ export default class Food {
       return false;
     }
   }
+
+  /**
+   *
+   * @param id
+   * @returns
+   */
+  static async getFoodById(id: number) {
+    return prisma.foods.findFirstOrThrow({
+      where: {
+        id,
+      },
+    });
+  }
+
+  static async updateFood(id: number, info: Partial<TCreateFoodBody>) {
+    const { id_food_category, is_available, ...food } = info;
+    await prisma.foods.update({
+      where: {
+        id,
+      },
+      data: {
+        ...food,
+        id_food_category:
+          id_food_category == undefined ? undefined : +id_food_category,
+        is_available:
+          is_available == undefined ? undefined : is_available == "true",
+      },
+    });
+  }
 }
 
 type TCreateFoodParam = Omit<

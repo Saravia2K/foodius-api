@@ -6,6 +6,8 @@ import path from "path";
 import fs from "fs";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 import CouldNotDeleteFood from "../errors/CouldNotDeleteFood";
+import { deleteFoodPic } from "../utils/deleteFile";
+import slugify from "../utils/slugify";
 
 export default class FoodController {
   /**
@@ -32,11 +34,7 @@ export default class FoodController {
 
       res.status(201).json(newFood);
     } catch (error: any) {
-      if (file != undefined) {
-        const filename = file.filename;
-        const imagePath = path.join(__dirname, `../uploads/foods/${filename}`);
-        if (fs.existsSync(imagePath)) fs.rmSync(imagePath);
-      }
+      deleteFoodPic(file);
 
       let statusCode = 500;
       let message = error.message;
@@ -55,9 +53,43 @@ export default class FoodController {
   /**
    * PATCH: /:id
    */
-  static async UpdateFood(req: Request<TIDParam>, res: Response) {
+  static async UpdateFood(
+    req: Request<TIDParam, {}, Partial<TCreateFoodBody>>,
+    res: Response
+  ) {
     try {
+      const { id } = req.params;
+
+      const food = await Food.getFoodById(+id);
+
+      const newFoodInfo: Partial<TCreateFoodBody> & { img_url: string } = {
+        ...req.body,
+        img_url: food.img_url,
+      };
+      if (req.body.name) {
+        const oldFilepath = path.join(
+          __dirname,
+          `../uploads/foods/${food.img_url}`
+        );
+        const ext = path.extname(food.img_url);
+        const name = req.body.name;
+        const filename = `${slugify(name)}${ext}`;
+        const newFilepath = path.join(
+          __dirname,
+          `../uploads/foods/${filename}`
+        );
+        fs.renameSync(oldFilepath, newFilepath);
+        newFoodInfo.img_url = filename;
+      }
+
+      await Food.updateFood(+id, newFoodInfo);
+
+      res.json({
+        message: "Product updated successfully",
+      });
     } catch (error: any) {
+      deleteFoodPic(req.file);
+
       res.status(500).json({
         message: `Error: ${error.message}`,
       });

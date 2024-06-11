@@ -228,6 +228,7 @@ export default class Business {
         Food: {
           select: {
             id: true,
+            id_food_category: true,
             name: true,
             description: true,
             img_url: true,

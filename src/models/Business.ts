@@ -247,6 +247,19 @@ export default class Business {
 
     return food;
   }
+
+  /**
+   *
+   * @param email
+   * @returns
+   */
+  static async getByEmail(email: string) {
+    return await prisma.businesses.findFirst({
+      where: {
+        email,
+      },
+    });
+  }
 }
 
 type TCreateBusinessParam = TRegisterBody & { logo: string; banner: string };

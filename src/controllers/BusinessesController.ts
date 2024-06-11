@@ -3,7 +3,8 @@ import fs from "fs";
 import path from "path";
 import Business from "../models/Business";
 import { TIDParam } from "../utils/types";
-import { TRegisterBody, TRegisterFiles } from "./types";
+import bcrypt from "bcryptjs";
+import type { TRegisterBody, TRegisterFiles } from "./types";
 
 export default class BusinessesController {
   /**
@@ -70,6 +71,11 @@ export default class BusinessesController {
     }
   }
 
+  /**
+   *
+   * @param req
+   * @param res
+   */
   static async GetBusiness(req: Request, res: Response) {
     try {
       const businesses = await Business.getAll();
@@ -81,6 +87,12 @@ export default class BusinessesController {
     }
   }
 
+  /**
+   *
+   * @param req
+   * @param res
+   * @returns
+   */
   static async GetInfo(req: Request, res: Response) {
     try {
       const { slug } = req.params;
@@ -130,4 +142,36 @@ export default class BusinessesController {
       });
     }
   }
+
+  /**
+   * POST: /login
+   */
+  static async Login(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body as TLogin;
+
+      const business = await Business.getByEmail(email);
+
+      if (business == null)
+        return res.status(404).json({
+          message: "Credenciales incorrectas",
+        });
+
+      const isPasswordCorrect = bcrypt.compareSync(password, business.password);
+      if (!isPasswordCorrect)
+        return res.status(404).json({
+          message: "Credenciales incorrectas",
+        });
+
+      const { password: _, ..._business } = business;
+
+      res.json(_business);
+    } catch (error: any) {
+      res.status(500).json({
+        message: `Error trying to login: ${error.message}`,
+      });
+    }
+  }
 }
+
+type TLogin = { email: string; password: string };

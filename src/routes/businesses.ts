@@ -5,6 +5,8 @@ import businessImagesMiddleware from "../middlewares/upload-business-files.middl
 const router = Router();
 
 //#region POST
+router.post("/login", BusinessesController.Login);
+
 router.post(
   "/",
   businessImagesMiddleware,

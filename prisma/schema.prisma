@@ -92,9 +92,16 @@ model OrdersDetails {
 
 model Cancellation {
   id      Int    @id @default(autoincrement())
-  order   Orders @relation(fields: [orderId], references: [id])
+  order   Orders @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   orderId Int
   message String
+}
+
+model RegisterTokens {
+  id        Int       @id @default(autoincrement())
+  token     String?   @unique @default(uuid()) @db.VarChar(100)
+  invalid   Boolean?  @default(false)
+  createdAt DateTime? @default(now())
 }
 
 enum ORDER_STATES {

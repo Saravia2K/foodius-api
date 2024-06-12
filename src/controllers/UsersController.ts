@@ -15,8 +15,19 @@ export default class UsersController {
         message: "User created successfully",
       });
     } catch (error: any) {
-      res.status(500).json({
-        message: `Error trying to sign-up a new user: ${error.message}`,
+      const statusCode = error.code == "P2002" ? 400 : 500;
+      const traductions = {
+        phone_number: "número telefónico",
+      };
+      const message =
+        statusCode == 500
+          ? `Error trying to sign-up a new user: ${error.message}`
+          : `Este ${
+              traductions[error.meta.target as keyof typeof traductions] ||
+              error.meta.target
+            } ya existe`;
+      res.status(statusCode).json({
+        message,
       });
     }
   }

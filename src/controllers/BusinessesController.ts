@@ -5,6 +5,8 @@ import Business from "../models/Business";
 import { TIDParam } from "../utils/types";
 import bcrypt from "bcryptjs";
 import type { TRegisterBody, TRegisterFiles } from "./types";
+import User from "../models/User";
+import UserAlreadyExists from "../errors/UserAlreadyExists";
 
 export default class BusinessesController {
   /**
@@ -28,6 +30,12 @@ export default class BusinessesController {
           "Logo and banner are required to create a new business"
         );
 
+      let user = await Promise.all([
+        User.getByEmail(businessInfo.email),
+        User.getByPhoneNumber(businessInfo.phone_number),
+      ]);
+      if (user.some((u) => u != null)) throw new UserAlreadyExists();
+
       const logoFile = files.logo[0];
       const bannerFile = files.banner[0];
 
@@ -48,8 +56,19 @@ export default class BusinessesController {
         }
       }
 
-      res.status(500).json({
-        message: `Error trying to register a business: ${error.message}`,
+      const statusCode = error.code == "P2002" ? 400 : 500;
+      const traductions = {
+        phone_number: "número telefónico",
+      };
+      const message =
+        statusCode == 500
+          ? `Error trying to sign-up a new business: ${error.message}`
+          : `Este ${
+              traductions[error.meta.target as keyof typeof traductions] ||
+              error.meta.target
+            } ya existe`;
+      res.status(statusCode).json({
+        message,
       });
     }
   }

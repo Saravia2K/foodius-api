@@ -18,6 +18,19 @@ export default class User {
 
   /**
    *
+   * @param phone_number
+   * @returns
+   */
+  static async getByPhoneNumber(phone_number: string) {
+    return await prisma.users.findFirst({
+      where: {
+        phone_number,
+      },
+    });
+  }
+
+  /**
+   *
    * @param user User information
    */
   static async create(user: TUser) {

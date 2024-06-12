@@ -282,6 +282,19 @@ export default class Business {
       },
     });
   }
+
+  /**
+   *
+   * @param phone_number
+   * @returns
+   */
+  static async getByPhoneNumber(phone_number: string) {
+    return await prisma.businesses.findFirst({
+      where: {
+        phone_number,
+      },
+    });
+  }
 }
 
 type TCreateBusinessParam = TRegisterBody & { logo: string; banner: string };

@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { TUser } from "../utils/types";
 import User from "../models/User";
+import UserAlreadyExists from "../errors/UserAlreadyExists";
+import Business from "../models/Business";
 
 export default class UsersController {
   /**
@@ -9,6 +11,12 @@ export default class UsersController {
    */
   static async SignUp(req: Request, res: Response) {
     try {
+      let business = await Promise.all([
+        Business.getByEmail(req.body.email),
+        Business.getByPhoneNumber(req.body.phone_number),
+      ]);
+      if (business.some((b) => b != null)) throw new UserAlreadyExists();
+
       await User.create(req.body as TUser);
 
       res.status(201).json({

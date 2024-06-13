@@ -91,13 +91,11 @@ export default class BusinessesController {
   }
 
   /**
-   *
-   * @param req
-   * @param res
+   * GET: /:day/:time
    */
-  static async GetBusiness(req: Request, res: Response) {
+  static async GetBusiness(req: Request<{ day: string }>, res: Response) {
     try {
-      const businesses = await Business.getAll();
+      const businesses = await Business.getAll(req.params.day);
       res.json(businesses);
     } catch (error: any) {
       res.status(500).json({

@@ -15,7 +15,7 @@ router.post(
 //#endregion
 
 //#region GET
-router.get("/", BusinessesController.GetBusiness);
+router.get("/:day", BusinessesController.GetBusiness);
 
 router.get("/:id/food", BusinessesController.GetBusinessFood);
 

@@ -10,10 +10,18 @@ import os from "os";
 export default class Business {
   /**
    *
+   * @param days
    * @returns
    */
-  static async getAll() {
+  static async getAll(day: string) {
     return await prisma.businesses.findMany({
+      where: {
+        Schedules: {
+          some: {
+            day,
+          },
+        },
+      },
       select: {
         name: true,
         banner: true,

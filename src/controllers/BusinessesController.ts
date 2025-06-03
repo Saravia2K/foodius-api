@@ -93,9 +93,12 @@ export default class BusinessesController {
   /**
    * GET: /:day/:time
    */
-  static async GetBusiness(req: Request<{ day: string }>, res: Response) {
+  static async GetBusiness(req: Request<TGetBusinessReqParams>, res: Response) {
     try {
-      const businesses = await Business.getAll(req.params.day);
+      const businesses = await Business.getTodays(
+        req.params.day,
+        +req.params.time
+      );
       res.json(businesses);
     } catch (error: any) {
       res.status(500).json({
@@ -192,3 +195,8 @@ export default class BusinessesController {
 }
 
 type TLogin = { email: string; password: string };
+
+type TGetBusinessReqParams = {
+  day: string;
+  time: string;
+};

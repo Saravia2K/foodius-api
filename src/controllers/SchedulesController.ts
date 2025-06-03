@@ -1,4 +1,3 @@
-import { error } from "console";
 import Schedules from "../models/Schedule";
 import type { Request, Response } from "express";
 
@@ -13,12 +12,13 @@ export default class SchedulesController{
             if(findSchedule){
                 return res.status(400).json({error: 'Schedule for this day already exists'});
             }
-
+            
+            const _to = new Date(new Date(to))
             const schedule = await Schedules.createSchedule(
                 Number(id_business),
                 day,
                 new Date(from),
-                new Date(to)
+                _to
             );
 
             res.status(201).json(schedule);

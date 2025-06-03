@@ -48,6 +48,7 @@ export default class Schedules {
 
   static async updateSchedule(id: number, from: Date, to: Date) {
     try {
+      console.log(to);
       return await prisma.schedules.update({
         where: {
           id,

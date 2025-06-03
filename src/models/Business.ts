@@ -13,15 +13,8 @@ export default class Business {
    * @param days
    * @returns
    */
-  static async getAll(day: string) {
+  static async getAll() {
     return await prisma.businesses.findMany({
-      where: {
-        Schedules: {
-          some: {
-            day,
-          },
-        },
-      },
       select: {
         name: true,
         banner: true,
@@ -31,6 +24,47 @@ export default class Business {
         id: "asc",
       },
     });
+  }
+
+  /**
+   *
+   * @param day
+   * @param time
+   */
+  static async getTodays(day: string, time: number) {
+    const targetDate = new Date(time);
+    const targetTime = new Date(
+      1970,
+      targetDate.getMonth(),
+      targetDate.getDate(),
+      targetDate.getHours(),
+      targetDate.getMinutes(),
+      targetDate.getSeconds()
+    );
+
+    return await prisma.$queryRaw`
+      SELECT b.name, b.banner, b.slug
+      FROM "Businesses" b
+      JOIN "Schedules" s ON b.id = s.id_business
+      WHERE s.day = ${day}
+        AND MAKE_TIMESTAMP(
+            1970,
+            EXTRACT(MONTH FROM s.from)::int,
+            EXTRACT(DAY FROM s.from)::int,
+            EXTRACT(HOUR FROM s.from)::int,
+            EXTRACT(MINUTE FROM s.from)::int,
+            EXTRACT(SECOND FROM s.from)::int
+        ) <= ${targetTime}
+        AND MAKE_TIMESTAMP(
+            1970,
+            EXTRACT(MONTH FROM s.to)::int,
+            EXTRACT(DAY FROM s.to)::int,
+            EXTRACT(HOUR FROM s.to)::int,
+            EXTRACT(MINUTE FROM s.to)::int,
+            EXTRACT(SECOND FROM s.to)::int
+        ) >= ${targetTime}
+      ORDER BY b.id ASC
+    `;
   }
 
   /**
